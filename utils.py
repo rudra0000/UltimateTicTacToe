@@ -12,10 +12,10 @@ def checkTerminalState(gameState):
                 return True,-1
     #check columns
     for col in range(3):
-        if gameState[col][0]==gameState[col][1] and gameState[col][1]==gameState[col][2]:
-            if gameState[col][0]=='x':
+        if gameState[0][col]==gameState[1][col] and gameState[1][col]==gameState[2][col]:
+            if gameState[0][col]=='x':
                 return True,1
-            elif gameState[col][1]=='o':
+            elif gameState[1][col]=='o':
                 return True,-1
     #check diagonals
     if gameState[0][0]==gameState[1][1] and gameState[1][1]==gameState[2][2]:
@@ -35,24 +35,43 @@ def checkTerminalState(gameState):
     else:
         return False,2**32-1
 
-#minimize the score  
-def checkAllPossibleMoves(gameState):
-    score=2**32-1
-    bestGameState=None
+#function to find all possible moves
+def findAllPossibleMoves(gameState,player):
+    allPossibleGameStates=[]
     for row in range(3):
         for col in range(3):
             if gameState[row][col]=='.':
-                newGameState=gameState
-                newGameState[row][col]='o'
-                res=checkTerminalState(newGameState)
-                #check if the game ends
-                if res[0]:
-                    if res[1]>score:
-                        score=res[1]
-                        bestGameState=newGameState
-                #the game has not ended explore more states
-                else:
-                    pass
-    return bestGameState
+                newGameState=[ele[:] for ele in gameState]
+                newGameState[row][col]=player
+                allPossibleGameStates.append(newGameState)
+                # print(f'old game state is {gameState}')
+    return allPossibleGameStates 
 
-    
+#human->maximizer
+#computer->minimizer
+#function will return best possible value of a state for each player
+#isTerminalState,score,best move if not a terminal state
+def minimax(gameState,isHumanTurn):
+    res=checkTerminalState(gameState)
+    if res[0]:
+        return True,res[1],None
+    else:
+        bestPossibleGameState=None
+        allStates=None
+        if isHumanTurn: #maximize
+            allStates=findAllPossibleMoves(gameState,'x')
+            score=-2**32-1
+            for state in allStates:
+                value=minimax(state,False)
+                if value[1]>score:
+                    score=value[1]
+                    bestPossibleGameState=state
+        else: #minimize
+            allStates=findAllPossibleMoves(gameState,'o')
+            score=2**32-1
+            for state in allStates:
+                value=minimax(state,True)
+                if value[1]<score:
+                    score=value[1]
+                    bestPossibleGameState=state
+        return False,score,bestPossibleGameState
