@@ -1,11 +1,17 @@
 from utils import minimax
 import pygame,sys
 pygame.init()
+#clock
+clock=pygame.time.Clock()
+FPS=60
 GREEN_COLOR=(0,255,0)
 CYAN_COLOR=(0,255,255)
+RED_COLOR=(255,0,0)
+BLUE_COLOR=(0,0,255)
 LINE_COLOR=GREEN_COLOR
 WIDTH,HEIGHT=800,600
 SQ_WIDTH,SQ_HEIGHT=100,100
+RADIUS=50
 SCREEN=pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Unbeatable Tic Tac Toe')
 def draw(gameState):
@@ -22,9 +28,9 @@ def draw(gameState):
             x_dist=(WIDTH/6)*(2*(i+1)-1)-SQ_WIDTH/2
             y_dist=(HEIGHT/6)*(2*(j+1)-1)-SQ_HEIGHT/2
             if gameState[i][j]=='x':
-                pygame.draw.rect(SCREEN,CYAN_COLOR,pygame.Rect(x_dist,y_dist,SQ_WIDTH,SQ_HEIGHT))
+                pygame.draw.rect(SCREEN,RED_COLOR,pygame.Rect(x_dist,y_dist,SQ_WIDTH,SQ_HEIGHT))
             elif gameState[i][j]=='o':
-                pygame.draw.circle()
+                pygame.draw.circle(SCREEN,BLUE_COLOR,(x_dist+SQ_WIDTH/2,y_dist+SQ_HEIGHT/2),RADIUS)
 
     # pygame.draw.rect(SCREEN,CYAN_COLOR,pygame.Rect(5*WIDTH/6-SQ_WIDTH/2,3*HEIGHT/6-SQ_HEIGHT/2,SQ_WIDTH,SQ_HEIGHT))
        
@@ -34,9 +40,9 @@ def draw(gameState):
 
 def main():
     gameState=[
-        ['o','x','o'],
-        ['x','o','o'],
-        ['o','.','.']
+        ['.','.','.'],
+        ['.','.','.'],
+        ['.','.','.']
     ]
     run=True
     while run:
@@ -48,16 +54,22 @@ def main():
             elif event.type==pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type==pygame.MOUSEBUTTONDOWN:
+                x_cor,y_cor=pygame.mouse.get_pos()
+                ind1=x_cor//(WIDTH/3)
+                ind2=y_cor//(HEIGHT/3)
+                gameState[int(ind1)][int(ind2)]='x'
+                print(ind1,ind2)
+                gameState=minimax(gameState,False)[2]
+                if not gameState:
+                    pygame.quit()
+                    sys.exit()
         #update game state
-
 
 
         #draw game state
         draw(gameState)
-
-
-    print(minimax(gameState,False))
-    # print(findAllPossibleMoves(gameState,'o'))
+        clock.tick(FPS)
 
 
 if __name__=='__main__':
