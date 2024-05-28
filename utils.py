@@ -7,27 +7,27 @@ def checkTerminalState(gameState):
         empty_cnt+=row.count('.')
         if row.count(row[0])==len(row):
             if row[0]=='x':
-                return True,1
+                return True,2**32-1
             elif row[0]=='o':
-                return True,-1
+                return True,-(2**32-1)
     #check columns
     for col in range(3):
         if gameState[0][col]==gameState[1][col] and gameState[1][col]==gameState[2][col]:
             if gameState[0][col]=='x':
-                return True,1
+                return True,2**32-1
             elif gameState[1][col]=='o':
-                return True,-1
+                return True,-(2**32-1)
     #check diagonals
     if gameState[0][0]==gameState[1][1] and gameState[1][1]==gameState[2][2]:
         if gameState[0][0]=='x':
-            return True,1
+            return True,2**32-1
         elif gameState[0][0]=='o':
-            return True,-1
+            return True,-(2**32-1)
     elif gameState[0][2]==gameState[1][1] and gameState[1][1]==gameState[2][0]:
         if gameState[1][1]=='x':
-            return True,1
+            return True,2**32-1
         elif gameState[1][1]=='o':
-            return True,-1
+            return True,-(2**32-1)
     
     #check if its a draw
     if empty_cnt==0:
@@ -65,6 +65,8 @@ def minimax(gameState,isHumanTurn):
                 value=minimax(state,False)
                 if value[1]>score:
                     score=value[1]
+                    if value[1]>1:
+                        score=1
                     bestPossibleGameState=state
         else: #minimize
             allStates=findAllPossibleMoves(gameState,'o')
@@ -73,5 +75,7 @@ def minimax(gameState,isHumanTurn):
                 value=minimax(state,True)
                 if value[1]<score:
                     score=value[1]
+                    if value[1]<-1:
+                        score=-1
                     bestPossibleGameState=state
         return False,score,bestPossibleGameState
