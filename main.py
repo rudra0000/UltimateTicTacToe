@@ -1,5 +1,5 @@
-from utils import minimax
-import pygame,sys
+from utils import minimax,checkTerminalState
+import pygame,sys,time
 pygame.init()
 #clock
 clock=pygame.time.Clock()
@@ -14,7 +14,8 @@ SQ_WIDTH,SQ_HEIGHT=100,100
 RADIUS=50
 SCREEN=pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption('Unbeatable Tic Tac Toe')
-def draw(gameState):
+def draw(gameState,isTerminalState):
+
     #draw vertical lines
     pygame.draw.line(SCREEN,LINE_COLOR,(WIDTH/3,0),(WIDTH/3,HEIGHT),7)
     pygame.draw.line(SCREEN,LINE_COLOR,(WIDTH/3*2,0),(WIDTH/3*2,HEIGHT),7)
@@ -32,8 +33,10 @@ def draw(gameState):
             elif gameState[i][j]=='o':
                 pygame.draw.circle(SCREEN,BLUE_COLOR,(x_dist+SQ_WIDTH/2,y_dist+SQ_HEIGHT/2),RADIUS)
 
-    # pygame.draw.rect(SCREEN,CYAN_COLOR,pygame.Rect(5*WIDTH/6-SQ_WIDTH/2,3*HEIGHT/6-SQ_HEIGHT/2,SQ_WIDTH,SQ_HEIGHT))
-       
+    if isTerminalState:
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render('Game Over', True, GREEN_COLOR, BLUE_COLOR)
+        SCREEN.blit(text,(0,0)) 
     #update display
     pygame.display.update()
 
@@ -47,7 +50,11 @@ def main():
     run=True
     while run:
         #handle events
+        isTerminalState=False
+        score=0
         for event in pygame.event.get():
+            if isTerminalState:
+                continue
             if event.type==pygame.KEYDOWN:
                 if event.key==pygame.K_ESCAPE:
                     run=False
@@ -60,15 +67,13 @@ def main():
                 ind2=y_cor//(HEIGHT/3)
                 gameState[int(ind1)][int(ind2)]='x'
                 print(ind1,ind2)
-                gameState=minimax(gameState,False)[2]
-                if not gameState:
-                    pygame.quit()
-                    sys.exit()
+                isTerminalState,score,gameState=minimax(gameState,False)
+
         #update game state
 
-
+        newTerminalState=checkTerminalState(gameState)[0]
         #draw game state
-        draw(gameState)
+        draw(gameState,newTerminalState)
         clock.tick(FPS)
 
 

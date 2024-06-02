@@ -54,7 +54,7 @@ def findAllPossibleMoves(gameState,player):
 def minimax(gameState,isHumanTurn):
     res=checkTerminalState(gameState)
     if res[0]:
-        return True,res[1],None
+        return True,res[1],gameState
     else:
         bestPossibleGameState=None
         allStates=None
